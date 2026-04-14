@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KISC Utilities - Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f8f9fa, #e9f5e9); }
+    header {
+      background: linear-gradient(135deg, #013220, #026b3f);
+      padding: 20px 0;
+    }
+    header img {
+      width: 90px;           /* Bigger logos */
+      height: auto;
+      margin: 0 15px;
+    }
+    .gold { color: #d4af37; font-weight: bold; }
+    .card { 
+      background: white; 
+      border-radius: 15px; 
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+      padding: 25px; 
+      margin-bottom: 25px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    th, td {
+      padding: 14px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #013220;
+      color: white;
+    }
+    tr:nth-child(even) { background: #f8fff8; }
+    .summary {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .summary-card {
+      flex: 1;
+      min-width: 220px;
+      background: linear-gradient(135deg, #013220, #026b3f);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .filter-row {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #d4af37;
+      color: #013220;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #e5c158; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="text-align: center;">
+      <img src="images/kisc.jpg" alt="KISC Logo">
+      <h1 style="color: white; display: inline;">Kitengela International Schools <span class="gold">Utilities Dashboard</span></h1>
+      <img src="images/esg.jpg" alt="ESG Logo">
+    </div>
+    <p style="color: white; text-align: center; margin-top: 10px;">ESG Monitoring System - Live Data</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>📊 Live Utilities Dashboard</h2>
+      
+      <div class="filter-row">
+        <select id="schoolFilter">
+          <option value="">All Schools</option>
+          <option value="Ann ESG: Kisc Kitengela School">Ann ESG: Kisc Kitengela School</option>
+          <option value="Kisc International British Curriculum School">Kisc International British Curriculum School</option>
+          <option value="Kisc Girls Senior School">Kisc Girls Senior School</option>
+          <option value="Kisc Athi River School">Kisc Athi River School</option>
+          <option value="Kisc Boys Senior School">Kisc Boys Senior School</option>
+          <option value="Kisc Syokimau School">Kisc Syokimau School</option>
+          <option value="Kisc Junior Secondary School">Kisc Junior Secondary School</option>
+          <option value="KISC Main Primary">KISC Main Primary</option>
+        </select>
+
+        <select id="typeFilter">
+          <option value="">All Utility Types</option>
+          <option value="gas_cylinder">Gas Cylinder</option>
+          <option value="bulk_gas">Bulk Gas</option>
+          <option value="water">Water</option>
+          <option value="electricity">Electricity</option>
+        </select>
+
+        <button onclick="loadData()">🔄 Refresh Data</button>
+        <button onclick="exportToCSV()">📥 Export to CSV</button>
+      </div>
+
+      <div class="summary" id="summaryCards">
+        <!-- Summary cards will be added by JavaScript -->
+      </div>
+
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>School</th>
+            <th>Type</th>
+            <th>Previous</th>
+            <th>Current</th>
+            <th>Consumption</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <nav style="text-align: center; margin-top: 20px;">
+      <a href="index.html" style="color: #013220; font-weight: bold; font-size: 18px;">← Back to Data Entry</a>
+    </nav>
+  </div>
+
+  <script>
+    async function loadData() {
+      try {
+        const res = await fetch('/data');
+        const records = await res.json();
+
+        const schoolFilter = document.getElementById('schoolFilter').value;
+        const typeFilter = document.getElementById('typeFilter').value;
+
+        // Filter records
+        let filtered = records;
+        if (schoolFilter) filtered = filtered.filter(r => r.school === schoolFilter);
+        if (typeFilter) filtered = filtered.filter(r => r.type === typeFilter);
+
+        // Populate table
+        const tbody = document.querySelector('#dataTable tbody');
+        tbody.innerHTML = '';
+
+        filtered.forEach(record => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${record.date}</td>
+            <td>${record.school}</td>
+            <td>${record.type}</td>
+            <td>${record.previousReading || 0}</td>
+            <td>${record.currentReading}</td>
+            <td><strong>${record.consumption}</strong></td>
+            <td>${record.remarks || '-'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        // Summary cards
+        const totalConsumption = filtered.reduce((sum, r) => sum + (r.consumption || 0), 0);
+        const totalRecords = filtered.length;
+
+        document.getElementById('summaryCards').innerHTML = `
+          <div class="summary-card">
+            <h3>Total Records</h3>
+            <h2>${totalRecords}</h2>
+          </div>
+          <div class="summary-card">
+            <h3>Total Consumption</h3>
+            <h2>${totalConsumption.toFixed(2)} units</h2>
+          </div>
+        `;
+
+      } catch (err) {
+        alert('Cannot load data. Make sure server is running.');
+        console.error(err);
+      }
+    }
+
+    function exportToCSV() {
+      alert('Export feature coming soon. For now, you can copy the table data.');
+    }
+
+    // Load data when page opens
+    window.onload = loadData;
+  </script>
+</body>
+</html>

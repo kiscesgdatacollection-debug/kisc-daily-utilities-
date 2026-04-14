@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KISC Utilities - Entry</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="images/kisc.jpg" width="70">
+    <h1>Kitengela International Schools <span class="gold">Utilities</span></h1>
+    <img src="images/esg.jpg" width="70">
+    <p>ESG Monitoring System</p>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>Data Entry Form</h2>
+      <form id="utilityForm">
+        <input type="date" id="date" required>
+
+        <select id="school" required>
+          <option value="">Select School</option>
+          <option value="Ann ESG: Kisc Kitengela School">Ann ESG: Kisc Kitengela School</option>
+          <option value="Kisc International British Curriculum School">Kisc International British Curriculum School</option>
+          <option value="Kisc Girls Senior School">Kisc Girls Senior School</option>
+          <option value="Kisc Athi River School">Kisc Athi River School</option>
+          <option value="Kisc Boys Senior School">Kisc Boys Senior School</option>
+          <option value="Kisc Syokimau School">Kisc Syokimau School</option>
+          <option value="Kisc Junior Secondary School">Kisc Junior Secondary School</option>
+          <option value="KISC Main Primary">KISC Main Primary</option>
+        </select>
+
+        <select id="type" required>
+          <option value="">Select Utility Type</option>
+          <option value="gas_cylinder">Gas Cylinder (Weekly)</option>
+          <option value="bulk_gas">Bulk Gas (Daily Meter)</option>
+          <option value="water">Water (Meter Reading)</option>
+          <option value="electricity">Electricity (Meter Reading)</option>
+        </select>
+
+        <input type="number" id="previousReading" placeholder="Previous Reading" step="0.01">
+        <input type="number" id="currentReading" placeholder="Current Reading" step="0.01" required>
+
+        <textarea id="remarks" rows="3" placeholder="Remarks (e.g. leak detected, normal usage)"></textarea>
+
+        <button type="submit">Save Record</button>
+      </form>
+    </div>
+
+    <nav>
+      <a href="dashboard.html">→ Go to Live Dashboard</a>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
